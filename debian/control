@@ -12,6 +12,7 @@ Build-Depends: autotools-dev,
                libev-dev,
                libgd2-dev | libgd2-noxpm-dev,
                libgeoip-dev,
+               libldap2-dev,
                liblua5.1-dev,
                libmhash-dev,
                libossp-uuid-dev,
@@ -25,14 +26,24 @@ Build-Depends: autotools-dev,
                ruby1.8-dev | ruby1.9.1-dev,
                rubygems,
                zlib1g-dev
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Homepage: http://nginx.net
 Vcs-Git: git://anonscm.debian.org/collab-maint/nginx.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/nginx.git;a=summary
 
 Package: nginx
 Architecture: all
-Depends: nginx-full | nginx-light, ${misc:Depends}
+Depends: nginx-full   (>= ${source:Version}) |
+         nginx-light  (>= ${source:Version}) |
+         nginx-extras (>= ${source:Version}) |
+         nginx-naxsi  (>= ${source:Version}) |
+         nginx-passenger  (>= ${source:Version}) ,
+         nginx-full   (<< ${source:Version}.1~) |
+         nginx-light  (<< ${source:Version}.1~) |
+         nginx-extras (<< ${source:Version}.1~) |
+         nginx-naxsi  (<< ${source:Version}.1~) |
+         nginx-passenger  (<< ${source:Version}.1~) ,
+         ${misc:Depends}
 Description: small, powerful, scalable web/proxy server
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
@@ -75,7 +86,8 @@ Description: small, powerful, scalable web/proxy server - common files
 Package: nginx-full
 Architecture: any
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.5-1)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-light, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (standard version)
@@ -92,9 +104,9 @@ Description: nginx web/proxy server (standard version)
  Limit Zone, Log, Map, Memcached, Proxy, Referer, Rewrite, SCGI,
  Split Clients, SSI, Upstream, User ID, UWSGI.
  .
- OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression,
- HTTP Sub, Image Filter, IPv6, Real IP, SSL, Stub Status, Substitution,
- WebDAV, XSLT.
+ OPTIONAL HTTP MODULES: Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub,
+ Image Filter, IPv6, Real IP, SSL, Stub Status, Substitution, WebDAV,
+ XSLT.
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
@@ -122,7 +134,8 @@ Package: nginx-light
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.5-1)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (basic version)
@@ -136,7 +149,8 @@ Description: nginx web/proxy server (basic version)
  STANDARD HTTP MODULES: Core, Access, Auth Basic, Auto Index, Charset,
  Empty GIF, FastCGI, Gzip, Headers, Index, Log, Map, Proxy, Rewrite, Upstream.
  .
- OPTIONAL HTTP MODULES: Gzip Precompression, IPv6, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Debug, Gzip Precompression, IPv6, Real Ip, SSL,
+ Stub Status.
  .
  THIRD PARTY MODULES: Echo.
  .
@@ -164,7 +178,8 @@ Depends: nginx-common (= ${source:Version}),
          ${misc:Depends},
          ${perl:Depends},
          ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.5-1)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-full, nginx-light, nginx-naxsi, nginx-passenger
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (extended version)
@@ -187,12 +202,11 @@ Description: nginx web/proxy server (extended version)
  .
  MAIL MODULES: Mail Core, IMAP, POP3, SMTP, SSL.
  .
- THIRD PARTY MODULES: Auth PAM, Cache purge, DAV Ext, Echo, Embedded Lua,
+ THIRD PARTY MODULES: Auth PAM, DAV Ext, Echo, Embedded Lua,
  Fancy Index, HttpHeadersMore, HTTP Substitution Filter,
- Nginx Development Kit, Upload Progress,
- Upstream Fair Queue.
+ Naxsi, Nginx Development Kit, Upload Progress, Upstream Fair Queue.
  .
- MODULES ADDED BY DOTDEB : File AIO, Syslog, Pinba, HTTP Gunzip,
+ MODULES ADDED BY DOTDEB : Auth LDAP, Cache purge, File AIO, Syslog, Pinba, HTTP Gunzip,
  HTTP push stream, PageSpeed, X-rid header
 
 Package: nginx-extras-dbg
@@ -214,7 +228,9 @@ Package: nginx-naxsi
 Architecture: any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.5-1),
+        nginx-naxsi-ui (<< 1.4.5-1)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light, nginx-passenger
 Description: nginx web/proxy server (version with naxsi)
  Nginx ("engine X") is a high-performance web and reverse proxy server
@@ -229,11 +245,11 @@ Description: nginx web/proxy server (version with naxsi)
  Limit Requests, Limit Zone, Log, Map, Memcached, Proxy, Referer,
  Rewrite, Split Clients, SSI, Upstream, User ID.
  .
- OPTIONAL HTTP MODULES: GeoIP, IPv6, Real IP, SSL, Stub Status.
+ OPTIONAL HTTP MODULES: Debug, IPv6, Real IP, SSL, Stub Status.
  .
  THIRD PARTY MODULES: Naxsi, Cache Purge, Upstream Fair.
  .
- MODULES ADDED BY DOTDEB : File AIO, Gzip static, Echo, Syslog, X-rid header
+ MODULES ADDED BY DOTDEB : File AIO, Geoip, Gzip static, Echo, Syslog, X-rid header
 
 Package: nginx-naxsi-dbg
 Architecture: any
@@ -250,34 +266,14 @@ Description: nginx web/proxy server (version with naxsi) - debugging symbols
  debugging issues that you may find. It should not be required for normal
  operation.
 
-Package: nginx-naxsi-ui
-Architecture: all
-Priority: extra
-Depends: daemon,
-         dbconfig-common,
-         nginx-naxsi (>= ${source:Version}),
-         python-twisted-web,
-         ${misc:Depends}
-Provides: httpd, naxsi, nginx
-Conflicts: nginx-extras, nginx-full, nginx-light, nginx-passenger
-Description: nginx web/proxy server - naxsi configuration front-end
- Nginx ("engine X") is a high-performance web and reverse proxy server
- created by Igor Sysoev. It can be used both as a standalone web server
- and as a proxy to reduce the load on back-end HTTP or mail servers.
- .
- This package provides the autolearning daemon and web user interface for
- nginx's naxsi module.
- .
- It includes an interceptor (listening on TCP port 8080), which monitors
- HTTP requests from naxsi, and an extractor (running on TCP port 8081),
- which reads the database and prints reports about blocked requests.
-
 Package: nginx-passenger
 Architecture: linux-any kfreebsd-any
 Priority: extra
 Depends: nginx-common (= ${source:Version}), ruby-passenger (>> 3.0.19), ${misc:Depends}, ${shlibs:Depends}
-Provides: httpd, nginx
+Breaks: nginx (<< 1.4.5-1)
+Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-full, nginx-light, nginx-naxsi
+Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (Passenger version)
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
